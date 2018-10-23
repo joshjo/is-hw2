@@ -1,3 +1,4 @@
 *.pyc
-aclImdb/
+example/aclImdb/
+.DS_Store
 
