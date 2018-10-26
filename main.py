@@ -16,7 +16,7 @@ if __name__ == '__main__':
         X.append(feature_extractor(review))
 
     weights = logistic_regression(
-        np.array(X), np.array(sentiments), 2000, 5e-5)
+        np.array(X), np.array(sentiments), 100000, 5e-5)
 
     correct = 0
     incorrect = 0

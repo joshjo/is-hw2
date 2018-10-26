@@ -19,18 +19,16 @@ def logistic_regression(
 
     weights = np.zeros(features.shape[1])
 
+    # lamb = 0.1
+
     for step in range(num_steps):
         scores = np.dot(features, weights)
         predictions = sigmoid(scores)
+        # reg = lamb / target.size * weights
 
-        # Update weights with gradient
         output_error_signal = target - predictions
         gradient = np.dot(features.T, output_error_signal)
         weights += learning_rate * gradient
-
-        # Print log-likelihood every so often
-        # if step % 10000 == 0:
-        #     print(log_likelihood(features, target, weights))
 
     return weights
 
