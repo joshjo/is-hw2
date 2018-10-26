@@ -1,7 +1,9 @@
 import numpy as np
+import math
 from nltk.stem.porter import PorterStemmer
 import re
 from nltk import bigrams
+
 from nltk.corpus import stopwords
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from collections import defaultdict
@@ -11,6 +13,7 @@ sia = SentimentIntensityAnalyzer()
 
 stop = stopwords.words('english')
 porter = PorterStemmer()
+pronouns = 'i me we us my mine our ours you your yours'.split(' ')
 
 
 def tokenizer(text):
@@ -22,16 +25,29 @@ def tokenizer(text):
     return tokenized
 
 
+def count_pronouns(words_list):
+    occurs = [1 for word in words_list for pronoun in pronouns if word == pronoun]
+    return len(occurs)
+
+
+def exists_word(word, words_list):
+    return 1 if word in words_list else 0
+
+
 def feature_extractor(text):
     tokenized = tokenizer(text)
-    total_polarity = defaultdict(int)
+    features = defaultdict(int)
     tokenized = bigrams(tokenized)
     for word in tokenized:
         polarity = sia.polarity_scores(word[0] + ' ' + word[1])
-        total_polarity['neg'] += polarity['neg']
-        total_polarity['pos'] += polarity['pos']
-        total_polarity['neu'] += polarity['neu']
-    return total_polarity
+        features['neg'] += polarity['neg']
+        features['pos'] += polarity['pos']
+    words_list = text.lower().split(' ')
+    features['nointext'] = exists_word('no', words_list)
+    features['exclamation'] = exists_word('!', words_list)
+    features['pronouns'] = count_pronouns(words_list)
+    features['wordcount'] = math.log(len(words_list))
+    return np.array(list(features.values()))
 
 
 def get_minibatch(doc_stream, size):
@@ -40,7 +56,7 @@ def get_minibatch(doc_stream, size):
         text, label = next(doc_stream)
         docs.append(text)
         y.append(label)
-    return docs, y
+    return np.array(docs), np.array(y)
 
 
 def stream_docs(path):
@@ -65,5 +81,5 @@ def analyse(size):
     print(correct, incorrect)
 
 
-if __name__ == '__main__':
-    analyse(5000)
+# if __name__ == '__main__':
+#     analyse(5000)
