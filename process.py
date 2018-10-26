@@ -37,9 +37,9 @@ def exists_word(word, words_list):
 def feature_extractor(text):
     tokenized = tokenizer(text)
     features = defaultdict(int)
-    tokenized = bigrams(tokenized)
+    # tokenized = bigrams(tokenized)
     for word in tokenized:
-        polarity = sia.polarity_scores(word[0] + ' ' + word[1])
+        polarity = sia.polarity_scores(word)
         features['neg'] += polarity['neg']
         features['pos'] += polarity['pos']
     words_list = text.lower().split(' ')
